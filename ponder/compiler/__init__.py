@@ -1,6 +1,10 @@
 from SNBT import SNBTCompound
 
 from ponder import Ponder
+from ponder.compiler.logger import get_logger
+
+logger = get_logger()
+
 
 def compile_operations(ponder: Ponder, pos_offset: tuple = (0, 0, 0)) -> list:
     """
@@ -9,6 +13,8 @@ def compile_operations(ponder: Ponder, pos_offset: tuple = (0, 0, 0)) -> list:
     :param pos_offset: 偏移坐标
     :return: 指令列表和执行时间
     """
+    logger.info("正在编译思索对象为指令...")
+
     world = {}  # 模拟世界
     commands = []  # 指令列表
     x_offset, y_offset, z_offset = pos_offset  # 偏移坐标
@@ -35,6 +41,8 @@ def compile_operations(ponder: Ponder, pos_offset: tuple = (0, 0, 0)) -> list:
     # TODO: 大型棋盘格生成
 
     # 重放操作
+    logger.debug(f"正在重放{len(ponder.commands)}条操作...")
+
     for i in ponder.commands:
         pos_str = f"{i['pos'][0]}, {i['pos'][1]}, {i['pos'][2]}"
 
@@ -111,7 +119,7 @@ def compile_operations(ponder: Ponder, pos_offset: tuple = (0, 0, 0)) -> list:
                 state_snbt_str = SNBTCompound(world[pos_str]['state']).dump()
                 state_str = state_snbt_str[1:-1]  # 去除{}
                 nbt_snbt_str = SNBTCompound(world[pos_str]['nbt']).dump()
-                block = 'minecraft:' + world[pos_str]['block'] if len(world[pos_str]['block'].split(':')) == 1\
+                block = 'minecraft:' + world[pos_str]['block'] if len(world[pos_str]['block'].split(':')) == 1 \
                     else world[pos_str]['block']  # 检查命名空间
 
                 if i['animation'] in animation_map:  # 若有动画效果则播放动画
@@ -119,7 +127,8 @@ def compile_operations(ponder: Ponder, pos_offset: tuple = (0, 0, 0)) -> list:
                                f"{i['pos'][1] + y_offset} "
                                f"{i['pos'][2] + z_offset} " + "{BlockState:{Name:\"" + block + "\",Properties:{"
                                + state_str + "}}, TileEntityData:" + nbt_snbt_str + ", NoGravity:1b, "
-                               "Time: 597, Motion:" + animation_map[i['animation']] + "}")
+                                                                                    "Time: 597, Motion:" +
+                               animation_map[i['animation']] + "}")
 
                     commands.append([i['time'], command])
                 # 更新世界
@@ -138,5 +147,5 @@ def compile_operations(ponder: Ponder, pos_offset: tuple = (0, 0, 0)) -> list:
             command = f"kill @e[tag={i['time'] + i['duration']}]"
             commands.append([i['time'] + i['duration'], command])
 
-
+    logger.info(f"已将{len(ponder.commands)}条操作编译为{len(commands)}条指令.")
     return commands

@@ -2,7 +2,9 @@ import os
 import shutil
 
 from ponder import Ponder
-from ponder.compiler import compile_operations
+from ponder.compiler import compile_operations, get_logger
+
+logger = get_logger()
 
 
 def compile_to_datapack(ponder: Ponder, version: bool = True, pos_offset: tuple = (0, 0, 0), ponder_name: str = "ponders",
@@ -16,8 +18,18 @@ def compile_to_datapack(ponder: Ponder, version: bool = True, pos_offset: tuple 
     :param output_dir: 输出目录
     :return: 输出路径
     """
+    logger.info(f"正在编译思索为数据包...")
+    logger.debug(f"传入参数: version={version}, pos_offset={pos_offset}, ponder_name={ponder_name}, "
+                 f"output_dir={output_dir}")
+
+    # 检测输出的zip文件是否存在
+    if os.path.exists(f"{output_dir}/{ponder_name}.zip"):
+        logger.warning(f"输出文件{output_dir}/{ponder_name}.zip已存在, 可能覆盖已有文件, 是否继续? (y/n)")
+        if input().lower() != "y":
+            logger.info(f"已取消编译.")
+            return
+
     commands = compile_operations(ponder, pos_offset)
-    print(commands)
 
     # 生成数据包主结构
     datapack_dir = f"{output_dir}/{ponder_name}"
@@ -70,3 +82,6 @@ def compile_to_datapack(ponder: Ponder, version: bool = True, pos_offset: tuple 
 
     # 删除临时文件
     shutil.rmtree(datapack_dir)
+
+    logger.info(f"编译完成, 共在{len(functions.keys())}个时刻输出{len(commands)}条指令, "
+                f"总动画长度: {max(functions.keys()) / 20}秒, 输出路径: {output_dir}/{ponder_name}.zip")
