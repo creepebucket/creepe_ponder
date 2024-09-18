@@ -1,5 +1,5 @@
 from ponder import Ponder
-from ponder.compiler import compile_to_datapack
+from ponder.compiler.datapack import compile_to_datapack
 
 """ creepe_ponder示例程序 """
 
