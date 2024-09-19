@@ -2,7 +2,8 @@ import os
 import shutil
 
 from ponder import Ponder
-from ponder.compiler import compile_operations, get_logger
+from ponder.compiler import compile_operations
+from ponder.formats import get_logger
 
 logger = get_logger()
 
