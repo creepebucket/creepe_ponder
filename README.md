@@ -22,3 +22,4 @@ pip install snbt colorama
 - 支持更多动画
 - 一次性编译多个动画
 - 语法检查
+- 全局角度偏移 / 镜像

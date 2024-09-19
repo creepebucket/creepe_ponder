@@ -55,9 +55,8 @@ def compile_operations(ponder: Ponder, pos_offset: tuple = (0, 0, 0)) -> list:
     logger.debug(f"正在重放{len(ponder.commands)}条操作...")
 
     for i in ponder.commands:
-        pos = (i['pos'][0], i['pos'][1], i['pos'][2])
-
         if i['type'] == "place":  # 放置方块
+            pos = (i['pos'][0], i['pos'][1], i['pos'][2])
             state_snbt = SNBTCompound(i['state']).dump()
             state_stripped = state_snbt[1:-1]  # 去除{}
             nbt_snbt_str = SNBTCompound(i['nbt']).dump()
@@ -114,6 +113,7 @@ def compile_operations(ponder: Ponder, pos_offset: tuple = (0, 0, 0)) -> list:
                 world[pos] = {"block": block, "state": i['state'], "nbt": i['nbt']}
 
         elif i['type'] == "remove":  # 移除方块
+            pos = (i['pos'][0], i['pos'][1], i['pos'][2])
             if world.get(pos):  # 检查方块是否存在
                 # 若存在则移除方块
 
@@ -169,12 +169,13 @@ def compile_operations(ponder: Ponder, pos_offset: tuple = (0, 0, 0)) -> list:
                 del world[pos]
 
         elif i['type'] == "text":  # 显示文字
+            pos = (i['pos'][0], i['pos'][1], i['pos'][2])
 
             # 显示文字
             commands.append([i['time'], text_display_cmd.format(
-                x=i['pos'][0] + x_offset,
-                y=i['pos'][1] + y_offset,
-                z=i['pos'][2] + z_offset,
+                x=pos[0] + x_offset,
+                y=pos[1] + y_offset,
+                z=pos[2] + z_offset,
                 text=i['text'],
                 tag=i['time'] + i['duration'],
                 deflection=i['rotation'][0],
@@ -183,6 +184,32 @@ def compile_operations(ponder: Ponder, pos_offset: tuple = (0, 0, 0)) -> list:
             # 执行清除
             command = f"kill @e[tag={i['time'] + i['duration']}]"
             commands.append([i['time'] + i['duration'], command])
+
+        elif i['type'] == "entity":  # 生成实体
+            pos = (i['pos'][0], i['pos'][1], i['pos'][2])
+
+            commands.append([i['time'], summon_cmd.format(
+                x=pos[0] + x_offset,
+                y=pos[1] + y_offset,
+                z=pos[2] + z_offset,
+                entity_name=i['name'],
+                nbt=SNBTCompound(i['nbt']).dump())])
+
+        elif i['type'] == "command":  # 执行自定义指令
+            command = i['command']
+
+            if '<' in command and '>' in command:
+                # 将用<>包裹的坐标进行转义, 添加偏移坐标
+                start_index = command.find('<') + 1  # 去除"<"字符
+                end_index = command.find('>')
+                coord_str = command[start_index:end_index]
+                x, y, z = coord_str.split(' ')
+
+                x, y, z = int(x) + x_offset, int(y) + y_offset, int(z) + z_offset
+
+                command = command.replace(f"<{coord_str}>", f"{x} {y} {z}")
+
+            commands.append([i['time'], command])
 
     logger.info(f"已将{len(ponder.commands)}条操作编译为{len(commands)}条指令.")
     return commands

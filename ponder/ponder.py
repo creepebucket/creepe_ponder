@@ -1,4 +1,3 @@
-
 class Ponder:
     """ 创建一个思索类, 用于记录用户每一步的操作, 并在编译器中重放并编译为Minecraft命令. """
 
@@ -12,9 +11,9 @@ class Ponder:
             raise ValueError('初始化思索失败: 边长超过7的大型棋盘格尺寸应为3的倍数')
 
         self.size = size
-        self.commands = [] # 记录用户的命令
+        self.commands = []  # 记录用户的命令
 
-    def place(self, time: int, pos: tuple, block: str, state: dict={}, nbt: dict={}):
+    def block(self, time: int, pos: tuple, block: str, state: dict = {}, nbt: dict = {}):
         """
         对一个方块进行放置, 也可以替换同一个方块或改变其状态.
         :param time: 放置时间, 单位为rt(红石刻, 1/10秒)
@@ -63,3 +62,32 @@ class Ponder:
             'text': text,
             'rotation': rotation,
             'duration': duration})
+
+    def entity(self, time: int, pos: tuple, name: str, nbt: dict = {}):
+        """
+        生成一个实体.
+        :param time: 显示时间, 单位为rt(红石刻, 1/10秒)
+        :param pos: (x, y, z) 坐标 地板位置x, y, z轴最小处为(0, 0, 0)
+        :param name: 实体名称, 如 'minecraft:cow'
+        :param nbt: 实体NBT数据, 如 {'CustomName': 'My Cow'}
+        """
+
+        self.commands.append({
+            'type': 'entity',
+            'time': time,
+            'pos': pos,
+            'name': name,
+            'nbt': nbt})
+
+    def command(self, time: int, command: str):
+        """
+        执行一个自定义命令.
+        注意: 在需要使用坐标的场景中, 需要使用<你的坐标>进行转义以支持坐标偏移, 如 tp 1 1 1 -> tp <1 1 1>
+        :param time: 执行时间, 单位为rt(红石刻, 1/10秒)
+        :param command: 要执行的命令, 如 'gamerule doDaylightCycle false' 不允许前导/
+        """
+
+        self.commands.append({
+            'type': 'command',
+            'time': time,
+            'command': command})
