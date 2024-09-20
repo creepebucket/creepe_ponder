@@ -1,3 +1,6 @@
+from ponder.formats import logger
+
+
 class Ponder:
     """ 创建一个思索类, 用于记录用户每一步的操作, 并在编译器中重放并编译为Minecraft命令. """
 
@@ -7,8 +10,8 @@ class Ponder:
         :param size: 边长
         """
 
-        if size > 7 and size % 3 != 0:
-            raise ValueError('初始化思索失败: 边长超过7的大型棋盘格尺寸应为3的倍数')
+        if size > 8 and size % 3 != 0:
+            logger.critical('初始化思索失败: 边长超过7的大型棋盘格尺寸应为3的倍数')
 
         self.size = size
         self.commands = []  # 记录用户的命令

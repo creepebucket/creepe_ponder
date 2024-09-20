@@ -77,7 +77,7 @@ pond.text(60, (1, 2, 2), 'Hello, world!', 40, [-10, 0, 0])
 pond.text(65, (2, 2, 2), 'Ponder is awesome!', 30, [0, 0, 0])
 pond.text(70, (3, 2, 2), 'This is a test!', 35, [10, 0, 0])
 
-pond.block(110, (2, 1, 2), 'barrel', {'facing': 'south'})
+pond.block(110, (2, 1, 2), 'chest', {'facing': 'south'})
 pond.block(115, (2, 2, 2), 'hopper')
 
 """
@@ -96,7 +96,7 @@ pond.remove(135, (2, 2, 2), animation='z+')
 pond.remove(140, (2, 1, 2), animation='destroy')
 
 """
-    我们可以看到, 破坏木桶时, 苹果作为掉落物掉落了. 如何清除?
+    我们可以看到, 破坏箱子时, 苹果作为掉落物掉落了. 如何清除?
     Ponder 实例并没有提供清除方块的方法, 但我们可以使用command()方法来执行命令.
     
     command()方法接受2个参数:
