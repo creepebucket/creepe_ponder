@@ -45,13 +45,13 @@ class Ponder:
             'pos': pos,
             'animation': animation})
 
-    def text(self, time: int, pos: tuple, text: str, duration: int = 20, rotation: list = [0, 0]):
+    def text(self, time: int, pos: tuple, text: str, duration: int = 20, rotation: list = [0, 0, 0]):
         """
         显示一段文字.
         :param time: 显示时间, 单位为rt(红石刻, 1/10秒)
         :param pos: (x, y, z) 坐标 地板位置x, y, z轴最小处为(0, 0, 0)
         :param text: 文字内容
-        :param rotation: (yaw, pitch) 旋转角度, 单位为度(°)
+        :param rotation: (yaw, pitch, roll) 旋转角度, 单位为度(°)
         :param duration: 持续时间, 单位为rt(红石刻, 1/10秒)
         """
 

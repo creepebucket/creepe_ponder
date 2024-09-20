@@ -2,6 +2,7 @@ from SNBT import SNBTCompound
 
 from ponder import Ponder
 from ponder.formats import *
+from ponder.utils import euler_to_quaternion
 
 logger = get_logger()
 
@@ -171,6 +172,18 @@ def compile_operations(ponder: Ponder, pos_offset: tuple = (0, 0, 0)) -> list:
         elif i['type'] == "text":  # 显示文字
             pos = (i['pos'][0], i['pos'][1], i['pos'][2])
 
+            # 将旋转转化为四元数
+            # 语法检查: yaw pitch roll取值
+            yaw, pitch, roll = i['rotation']
+
+            logger.error(f"语法错误! 文字{i['text']}(在{i['time']}生成, 坐标为{pos})的偏转角为{i['rotation'][0]}, 不符合0~360度的"
+                         f"范围, 可能无法渲染!") if not 0 <= yaw <= 360 else 0
+            logger.error(f"语法错误! 文字{i['text']}(在{i['time']}生成, 坐标为{pos})的俯仰角为{i['rotation'][1]}, 不符合-90~90度的"
+                         f"范围, 可能无法渲染!") if not -90 <= pitch <= 90 else 0
+            logger.error(f"语法错误! 文字{i['text']}(在{i['time']}生成, 坐标为{pos})的横滚角为{i['rotation'][2]}, 不符合-180~180度"
+                         f"的范围, 可能无法渲染!") if not -180 <= roll <= 180 else 0
+            rotation = euler_to_quaternion(i['rotation'])
+
             # 显示文字
             commands.append([i['time'], text_display_cmd.format(
                 x=pos[0] + x_offset,
@@ -178,8 +191,7 @@ def compile_operations(ponder: Ponder, pos_offset: tuple = (0, 0, 0)) -> list:
                 z=pos[2] + z_offset,
                 text=i['text'],
                 tag=i['time'] + i['duration'],
-                deflection=i['rotation'][0],
-                pitch=i['rotation'][1],)])
+                rotation=rotation)])
 
             # 执行清除
             command = f"kill @e[tag={i['time'] + i['duration']}]"
