@@ -40,7 +40,7 @@ def compile_to_datapack(ponder: Ponder, version: bool = True, pos_offset: tuple 
     # 生成pack.mcmeta
     with open(f"{datapack_dir}/pack.mcmeta", "w", encoding="utf-8") as f:
         # FIXME: 寻找正确的pack_format
-        f.write('{"pack":{"pack_format":48,"description":"使用creepe_ponder生成的思索数据包"}}')
+        f.write(r'{"pack":{"pack_format":16,"supported_formats":[16,39],"description":"使用creepe_ponder生成的思索数据包"}}')
 
     # 生成用于存放函数的文件夹
     function_dir = f"{datapack_dir}/data/{ponder_name}/function" if version else \
