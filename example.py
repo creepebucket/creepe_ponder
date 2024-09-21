@@ -67,17 +67,17 @@ pond.remove(50, (2, 1, 2))
     - pos: (x, y, z) 坐标 地板位置x, y, z轴最小处为(0, 0, 0)
     - text: 文本内容
     - duration: 持续时间, 单位为rt (可选, 默认为20)
-    - rotation: [deflection, pitch] 旋转角度, 单位为度 (可选, 默认为[0, 0])
-      偏转角取值 0 - 360 度, 俯仰角取值 -90 - 90 度.
+    - rotation: [yaw, pitch, roll] 旋转角度, 单位为度 (可选, 默认为[0, 0])
+      偏转角取值 0 - 360 度, 俯仰角取值 -90 - 90 度, 横滚角取值 0 - 360 度.
       
     试试创建一些角度, 持续时间不同的文本:
 """
 
-pond.text(60, (1, 2, 2), 'Hello, world!', 40, [-10, 0])
-pond.text(65, (2, 2, 2), 'Ponder is awesome!', 30, [0, 0])
-pond.text(70, (3, 2, 2), 'This is a test!', 35, [10, 0])
+pond.text(60, (1, 2, 2), 'Hello, world!', 40, [-10, 0, 0])
+pond.text(65, (2, 2, 2), 'Ponder is awesome!', 30, [0, 0, 0])
+pond.text(70, (3, 2, 2), 'This is a test!', 35, [10, 0, 0])
 
-pond.block(110, (2, 1, 2), 'barrel', {'facing': 'south'})
+pond.block(110, (2, 1, 2), 'chest', {'facing': 'south'})
 pond.block(115, (2, 2, 2), 'hopper')
 
 """
@@ -96,7 +96,7 @@ pond.remove(135, (2, 2, 2), animation='z+')
 pond.remove(140, (2, 1, 2), animation='destroy')
 
 """
-    我们可以看到, 破坏木桶时, 苹果作为掉落物掉落了. 如何清除?
+    我们可以看到, 破坏箱子时, 苹果作为掉落物掉落了. 如何清除?
     Ponder 实例并没有提供清除方块的方法, 但我们可以使用command()方法来执行命令.
     
     command()方法接受2个参数:

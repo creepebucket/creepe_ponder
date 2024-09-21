@@ -68,8 +68,9 @@ def get_logger():
 """ 指令格式 """
 
 falling_block_cmd = ('summon falling_block {x} {y} {z} {{BlockState:{{Name:"{block_name}",Properties:{{{block_state}}}'
-                     '}},TileEntityData:{nbt},NoGravity:1b,Time:597,Motion:[{motion_x},{motion_y},{motion_z}]}}')
+                     '}},TileEntityData:{nbt},NoGravity:1b,Time:596,Motion:[{motion_x},{motion_y},{motion_z}]}}')
 setblock_cmd = 'setblock {x} {y} {z} {block_name}[{block_state_stripped}]{nbt}'
 summon_cmd = 'summon {entity_name} {x} {y} {z} {nbt}'
-text_display_cmd = ('summon text_display {x} {y} {z} {{text:\'"{text}"\',Tags:["{tag}"],see_through:1b,Rotation:'
-                    '[{deflection},{pitch}]}}')
+text_display_cmd = ('summon text_display {x} {y} {z} {{text:\'"{text}"\',Tags:["{tag}"],see_through:1b,transformation:'
+                    '{{left_rotation: {rotation}, translation: [0, 0, 0], right_rotation: [0, 0, 0, 1], scale: [1, 1'
+                    ', 1]}}}}')

@@ -2,6 +2,7 @@ from SNBT import SNBTCompound
 
 from ponder import Ponder
 from ponder.formats import *
+from ponder.utils import euler_to_quaternion
 
 logger = get_logger()
 
@@ -22,12 +23,12 @@ def compile_operations(ponder: Ponder, pos_offset: tuple = (0, 0, 0)) -> list:
     # 生成思索地板
     size = ponder.size
 
-    if size < 8:  # 小型棋盘格
+    if size < 9:  # 小型棋盘格
         for x in range(size):
             for z in range(size):
                 pos = (x, 0, z)
 
-                if (x % 2 == 0 and z % 2 == 0) or (x % 2 == 1 and z % 2 == 1):  # 若xz坐标奇偶相同则为白色方块
+                if x % 2 == z % 2:  # 若xz坐标奇偶相同则为白色方块
                     world[pos] = {"block": "minecraft:snow_block", "state": {}, "nbt": ""}
                     commands.append({0, setblock_cmd.format(
                         x=x + x_offset,
@@ -47,9 +48,52 @@ def compile_operations(ponder: Ponder, pos_offset: tuple = (0, 0, 0)) -> list:
                         nbt="")})
 
     else:  # 大型棋盘格
-        pass
 
-        # TODO: 大型棋盘格生成
+        for x in range(size):
+            for z in range(size):
+                pos = (x, 0, z)
+                chunkx = int(x / 3)
+                chunkz = int(z / 3)
+
+                if chunkx % 2 == chunkz % 2:  # 若区块坐标奇偶相同则为白色区块
+                    if x % 3 == 1 and z % 3 == 1:  # 若坐标在白色区块中心则为黑色方块
+                        world[pos] = {"block": "minecraft:light_gray_concrete", "state": {}, "nbt": ""}
+                        commands.append({0, setblock_cmd.format(
+                            x=x + x_offset,
+                            y=0 + y_offset,
+                            z=z + z_offset,
+                            block_name="minecraft:light_gray_concrete",
+                            block_state_stripped="",
+                            nbt="")})
+                    else:  # 若坐标不在中心则为白色方块
+                        world[pos] = {"block": "minecraft:snow_block", "state": {}, "nbt": ""}
+                        commands.append({0, setblock_cmd.format(
+                            x=x + x_offset,
+                            y=0 + y_offset,
+                            z=z + z_offset,
+                            block_name="minecraft:snow_block",
+                            block_state_stripped="",
+                            nbt="")})
+                else:  # 若区块坐标奇偶不同则为黑色区块
+                    if x % 3 == 1 and z % 3 == 1:  # 若坐标在黑色区块中心则为白色方块
+                        world[pos] = {"block": "minecraft:snow_block", "state": {}, "nbt": ""}
+                        commands.append({0, setblock_cmd.format(
+                            x=x + x_offset,
+                            y=0 + y_offset,
+                            z=z + z_offset,
+                            block_name="minecraft:snow_block",
+                            block_state_stripped="",
+                            nbt="")})
+                    else:  # 若坐标不在中心则为黑色方块
+                        world[pos] = {"block": "minecraft:light_gray_concrete", "state": {}, "nbt": ""}
+                        commands.append({0, setblock_cmd.format(
+                            x=x + x_offset,
+                            y=0 + y_offset,
+                            z=z + z_offset,
+                            block_name="minecraft:light_gray_concrete",
+                            block_state_stripped="",
+                            nbt="")})
+
 
     # 重放操作
     logger.debug(f"正在重放{len(ponder.commands)}条操作...")
@@ -62,29 +106,7 @@ def compile_operations(ponder: Ponder, pos_offset: tuple = (0, 0, 0)) -> list:
             nbt_snbt_str = SNBTCompound(i['nbt']).dump()
             block = 'minecraft:' + i['block'] if len(i['block'].split(':')) == 1 else i['block']  # 检查命名空间
 
-            if world.get(pos):  # 检查方块是否存在
-                # 若存在则直接替换方块
-
-                commands.append([i['time'], setblock_cmd.format(
-                    x=i['pos'][0] + x_offset,
-                    y=i['pos'][1] + y_offset,
-                    z=i['pos'][2] + z_offset,
-                    block_name='air',
-                    block_state_stripped="",
-                    nbt="")])
-
-                commands.append([i['time'], setblock_cmd.format(
-                    x=i['pos'][0] + x_offset,
-                    y=i['pos'][1] + y_offset,
-                    z=i['pos'][2] + z_offset,
-                    block_name=block,
-                    block_state_stripped=state_stripped.replace(':"', '="'),
-                    nbt=nbt_snbt_str)])
-
-                # 更新世界
-                world[pos] = {"block": block, "state": i['state'], "nbt": i['nbt']}
-
-            else:  # 若不存在则放置方块
+            if world.get(pos) is None or world.get(pos)['block'] != block:  # 如果方块改变则播放动画
                 # 如果方块下方不存在方块则放置一个屏障
                 if world.get((i['pos'][0], i['pos'][1] - 1, i['pos'][2])) is None:
                     commands.append([i['time'], setblock_cmd.format(
@@ -109,8 +131,25 @@ def compile_operations(ponder: Ponder, pos_offset: tuple = (0, 0, 0)) -> list:
                     motion_y=-0.1,
                     motion_z=0.0)])
 
-                # 更新世界
-                world[pos] = {"block": block, "state": i['state'], "nbt": i['nbt']}
+            # 需要确保方块被放置
+            commands.append([i['time'] + 2, setblock_cmd.format(
+                x=i['pos'][0] + x_offset,
+                y=i['pos'][1] + y_offset,
+                z=i['pos'][2] + z_offset,
+                block_name='air',
+                block_state_stripped="",
+                nbt="")])
+
+            commands.append([i['time'] + 2, setblock_cmd.format(
+                x=i['pos'][0] + x_offset,
+                y=i['pos'][1] + y_offset,
+                z=i['pos'][2] + z_offset,
+                block_name=block,
+                block_state_stripped=state_stripped.replace(':"', '="'),
+                nbt=nbt_snbt_str)])
+
+            # 更新世界
+            world[pos] = {"block": block, "state": i['state'], "nbt": i['nbt']}
 
         elif i['type'] == "remove":  # 移除方块
             pos = (i['pos'][0], i['pos'][1], i['pos'][2])
@@ -171,6 +210,18 @@ def compile_operations(ponder: Ponder, pos_offset: tuple = (0, 0, 0)) -> list:
         elif i['type'] == "text":  # 显示文字
             pos = (i['pos'][0], i['pos'][1], i['pos'][2])
 
+            # 将旋转转化为四元数
+            # 语法检查: yaw pitch roll取值
+            yaw, pitch, roll = i['rotation']
+
+            logger.error(f"语法错误! 文字{i['text']}(在{i['time']}生成, 坐标为{pos})的偏转角为{i['rotation'][0]}, 不符合0~360度的"
+                         f"范围, 可能无法渲染!") if not 0 <= yaw <= 360 else 0
+            logger.error(f"语法错误! 文字{i['text']}(在{i['time']}生成, 坐标为{pos})的俯仰角为{i['rotation'][1]}, 不符合-90~90度的"
+                         f"范围, 可能无法渲染!") if not -90 <= pitch <= 90 else 0
+            logger.error(f"语法错误! 文字{i['text']}(在{i['time']}生成, 坐标为{pos})的横滚角为{i['rotation'][2]}, 不符合-180~180度"
+                         f"的范围, 可能无法渲染!") if not -180 <= roll <= 180 else 0
+            rotation = euler_to_quaternion(i['rotation'])
+
             # 显示文字
             commands.append([i['time'], text_display_cmd.format(
                 x=pos[0] + x_offset,
@@ -178,8 +229,7 @@ def compile_operations(ponder: Ponder, pos_offset: tuple = (0, 0, 0)) -> list:
                 z=pos[2] + z_offset,
                 text=i['text'],
                 tag=i['time'] + i['duration'],
-                deflection=i['rotation'][0],
-                pitch=i['rotation'][1],)])
+                rotation=rotation)])
 
             # 执行清除
             command = f"kill @e[tag={i['time'] + i['duration']}]"
