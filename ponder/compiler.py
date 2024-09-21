@@ -1,8 +1,8 @@
 from SNBT import SNBTCompound
 
-from ..formats import *
-from ..ponder import Ponder
-from ..utils import euler_to_quaternion
+from .formats import *
+from .ponder import Ponder
+from .utils import euler_to_quaternion
 
 
 def compile_operations(ponder: Ponder, pos_offset: tuple = (0, 0, 0)) -> list:
