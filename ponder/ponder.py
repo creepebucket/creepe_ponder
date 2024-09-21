@@ -175,7 +175,7 @@ class Ponder:
 
         # 使用/schedule指令让函数文件按顺序执行
         for time in functions.keys():
-            command_list.append(f"schedule function {ponder_name}:{time} {time * 2 + 1} append")  # rt转为gt, 并增加一个偏移量
+            command_list.append(f"schedule function {ponder_name}:_{time} {time * 2 + 1} append")  # rt转为gt, 并增加一个偏移量
 
         main_function_file = function_dir / "main.mcfunction"
         main_function_file.write_text('\n'.join(command_list))
