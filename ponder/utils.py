@@ -1,6 +1,6 @@
 import math
 
-from ponder.formats import logger
+from .formats import logger
 
 
 def euler_to_quaternion(euler_angles):
@@ -26,4 +26,4 @@ def euler_to_quaternion(euler_angles):
     q_y = cy * sp * cr + sy * cp * sr
     q_z = cy * cp * sr - sy * sp * cr
 
-    return [q_w, q_x, q_y, q_z]
+    return q_w, q_x, q_y, q_z

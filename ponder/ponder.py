@@ -1,4 +1,4 @@
-from ponder.formats import logger
+from .formats import logger
 
 
 class Ponder:
@@ -32,7 +32,8 @@ class Ponder:
             'pos': pos,
             'block': block,
             'state': state,
-            'nbt': nbt})
+            'nbt': nbt
+        })
 
     def remove(self, time: int, pos: tuple, animation: str = 'y+'):
         """
@@ -46,7 +47,8 @@ class Ponder:
             'type': 'remove',
             'time': time,
             'pos': pos,
-            'animation': animation})
+            'animation': animation
+        })
 
     def text(self, time: int, pos: tuple, text: str, duration: int = 20, rotation: list = [0, 0, 0]):
         """
@@ -64,7 +66,8 @@ class Ponder:
             'pos': pos,
             'text': text,
             'rotation': rotation,
-            'duration': duration})
+            'duration': duration
+        })
 
     def entity(self, time: int, pos: tuple, name: str, nbt: dict = {}):
         """
@@ -80,7 +83,8 @@ class Ponder:
             'time': time,
             'pos': pos,
             'name': name,
-            'nbt': nbt})
+            'nbt': nbt
+        })
 
     def command(self, time: int, command: str):
         """
@@ -93,4 +97,5 @@ class Ponder:
         self.commands.append({
             'type': 'command',
             'time': time,
-            'command': command})
+            'command': command
+        })
