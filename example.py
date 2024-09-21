@@ -1,5 +1,5 @@
 from ponder import Ponder
-from ponder.compiler.datapack import compile_to_datapack
+from ponder.compiler import compile_datapack
 
 """ creepe_ponder示例程序 """
 
@@ -124,7 +124,7 @@ pond.command(150, 'kill @e[type=item]')
     另外假设我们在使用1.20.1版本的Minecraft, 所以我们需要设置version参数为False:
 """
 
-compile_to_datapack(pond, False, (0, 1, 0), 'ponder_test', './outputs')
+compile_datapack(pond, False, (0, 1, 0), 'ponder_test', './outputs')
 
 """
     编译完成后, 你会在outputs目录下看到一个名为ponder_test.zip的压缩文件, 这个文件就是你的思索动画了, 以数据包的形式保存.
