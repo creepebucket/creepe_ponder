@@ -1,11 +1,10 @@
 import os
 import shutil
+from pathlib import Path
 
-from ponder import Ponder
-from ponder.compiler import compile_operations
-from ponder.formats import get_logger
-
-logger = get_logger()
+from ..ponder import Ponder
+from ..format import logger
+from .compiler import compile_operations
 
 
 def compile_to_datapack(ponder: Ponder, version: bool = True, pos_offset: tuple = (0, 0, 0), ponder_name: str = "ponders",
@@ -23,9 +22,11 @@ def compile_to_datapack(ponder: Ponder, version: bool = True, pos_offset: tuple 
     logger.debug(f"传入参数: version={version}, pos_offset={pos_offset}, ponder_name={ponder_name}, "
                  f"output_dir={output_dir}")
 
+    output_file = Path(output_dir) / f"{ponder_name}.zip"
+
     # 检测输出的zip文件是否存在
-    if os.path.exists(f"{output_dir}/{ponder_name}.zip"):
-        logger.warning(f"输出文件{output_dir}/{ponder_name}.zip已存在, 可能覆盖已有文件, 是否继续? (y/n)")
+    if output_file.exists():
+        logger.warning(f"输出文件{output_file}已存在, 可能覆盖已有文件, 是否继续? (y/n)")
         if input().lower() != "y":
             logger.info(f"已取消编译.")
             return
