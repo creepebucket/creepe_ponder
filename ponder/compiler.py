@@ -1,11 +1,16 @@
 from SNBT import SNBTCompound
+from typing import TYPE_CHECKING
 
 from .formats import *
-from .ponder import Ponder
 from .utils import euler_to_quaternion
 
 
-def compile_operations(ponder: Ponder, pos_offset: tuple = (0, 0, 0)) -> list:
+if TYPE_CHECKING:
+    from .ponder import Ponder
+
+
+
+def compile_operations(ponder: "Ponder", pos_offset: tuple = (0, 0, 0)) -> list:
     """
     编译你的思索对象为Minecraft指令
     :param ponder: 你的思索对象
