@@ -67,7 +67,7 @@ class Ponder:
             'text': text,
             'rotation': rotation,
             'duration': duration
-        }
+        })
 
     def entity(self, time: int, pos: tuple, name: str, nbt: dict = {}):
         """
