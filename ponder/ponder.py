@@ -38,7 +38,7 @@ class Ponder:
         x, y, z= pos
         self.commands.append({
             'type': 'command',
-            'time': 0,
+            'time': time,
             'command': f'/excute at {x} {y} {z} run kill @e[type=minecraft:item,r=2]'
         })
     def remove(self, time: int, pos: tuple, animation: str = 'y+'):
