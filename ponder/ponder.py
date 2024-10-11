@@ -34,7 +34,13 @@ class Ponder:
             'state': state,
             'nbt': nbt
         })
-
+        # 修复掉落物问题
+        x, y, z= pos
+        self.commands.append({
+            'type': 'command',
+            'time': 0,
+            'command': f'/excute at {x} {y} {z} run kill @e[type=minecraft:item,r=2]'
+        })
     def remove(self, time: int, pos: tuple, animation: str = 'y+'):
         """
         对一个方块进行移除.
